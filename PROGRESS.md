@@ -22,7 +22,7 @@ successfully. The project is in the **end-to-end testing / hardening** phase.
 | 2 | File explorer (tree + list) | ✅ | ✅ | navigation across the filesystem confirmed |
 | 3 | Upload / download | ✅ | ⚠️ | code paths exercised; not fully drag-tested live |
 | 4 | File editor (Monaco) | ✅ | ⚠️ | read confirmed live; save not yet exercised |
-| 5 | Interactive terminal | ✅ | ⚠️ | WS handshake tested; live keystrokes pending |
+| 5 | Interactive terminal | ✅ | ✅ | live WS session connects (open/close confirmed against the VPS) |
 | 6 | System dashboard | ✅ | ✅ | metrics + processes returning 200 live |
 | 7 | Log viewer | ✅ | ⚠️ | WS + list built; live tail pending |
 
@@ -60,6 +60,15 @@ Legend: ✅ done · ⚠️ implemented but not yet confirmed against the live VP
 - **UI/UX** — file tree rooted at `/` (was stuck at `/home/<user>`); macOS
   traffic-light buttons no longer overlap the title; DevTools no longer open
   automatically.
+- **Dynamic `$HOME` resolution** — the explorer no longer hardcodes a landing
+  path. The backend resolves the SSH user's home at connect time
+  (`sftp.normalize(".")`), returns it from `/connect` + `/status`, and the
+  explorer opens there (falling back to `/`). Confirmed live: opens on
+  `/home/kzool`.
+- **`start.sh` lifecycle** — the launcher's final `wait` blocked on every
+  background job, so closing the app left the backend and Vite running. The
+  script now waits on the Electron PID only; closing the window triggers the
+  `EXIT` trap that tears down the backend and Vite.
 
 ---
 
@@ -81,8 +90,8 @@ Legend: ✅ done · ⚠️ implemented but not yet confirmed against the live VP
 
 ## Roadmap / next steps
 
-1. **Live end-to-end test pass** of the unverified modules (upload/download,
-   editor save, terminal, logs).
+1. **Live end-to-end test pass** of the remaining unverified modules
+   (upload/download, editor save, log tail). Terminal now confirmed live.
 2. **SSH key authentication** (key path + passphrase) — recommended given the
    user's key-based setup.
 3. ~~Relocate the project out of iCloud and confirm clean startup.~~ **Done** —

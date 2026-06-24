@@ -70,6 +70,7 @@ vps-manager/
 │   ├── build-backend.sh      freeze backend with PyInstaller
 │   ├── make-icon.{py,sh}     generate placeholder icon.icns
 │   └── test-connection.sh    automated connection-route checks
+├── GUIDE_UTILISATION.md      end-user guide (FR): clone, run, connect, stop
 ├── FEATURES.md               full feature list
 ├── PROGRESS.md               technical status + roadmap
 └── README.md
