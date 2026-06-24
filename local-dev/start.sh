@@ -44,6 +44,8 @@ done
 
 # Track child PIDs so we can clean them up on exit.
 PIDS=()
+# PID of the Electron process, if launched — the script's lifetime is tied to it.
+ELECTRON_PID=""
 
 cleanup() {
   echo ""
@@ -147,9 +149,19 @@ if [ "$RUN_ELECTRON" = true ]; then
     VPS_BACKEND_PORT="$BACKEND_PORT" \
     VPS_SKIP_BACKEND=1 \
     npm run dev &
-  PIDS+=($!)
+  ELECTRON_PID=$!
+  PIDS+=("$ELECTRON_PID")
 fi
 
 echo ""
-echo "All processes started. Press Ctrl+C to stop."
-wait
+if [ -n "$ELECTRON_PID" ]; then
+  # Tie the script's lifetime to the Electron window: when the app is closed,
+  # this wait returns and the EXIT trap tears down the backend and Vite. Ctrl+C
+  # works the same way via the INT trap.
+  echo "All processes started. Close the app window or press Ctrl+C to stop."
+  wait "$ELECTRON_PID" || true
+else
+  # No Electron (--no-electron / --backend-only): keep running until interrupted.
+  echo "All processes started. Press Ctrl+C to stop."
+  wait
+fi
