@@ -1,0 +1,61 @@
+{
+  "name": "vps-manager-electron",
+  "version": "0.1.0",
+  "description": "VPS Manager — Electron shell",
+  "main": "main.js",
+  "author": "Hatim Hebboul",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "icon": "bash ../local-dev/make-icon.sh",
+    "build:frontend": "npm --prefix ../frontend install && npm --prefix ../frontend run build",
+    "build:backend": "bash ../local-dev/build-backend.sh",
+    "prebuild": "npm run icon",
+    "dist": "npm run icon && npm run build:frontend && npm run build:backend && electron-builder",
+    "dist:dir": "npm run icon && npm run build:frontend && npm run build:backend && electron-builder --dir"
+  },
+  "devDependencies": {
+    "electron": "^28.2.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.vpsmanager.app",
+    "productName": "VPS Manager",
+    "directories": {
+      "output": "../dist-electron",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "about.html",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../frontend/dist",
+        "to": "frontend"
+      },
+      {
+        "from": "backend-build/dist/vps-manager-backend",
+        "to": "backend"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "build/icon.icns",
+      "target": [
+        { "target": "dmg", "arch": ["arm64"] },
+        { "target": "dir", "arch": ["arm64"] }
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "VPS Manager ${version}"
+    }
+  }
+}

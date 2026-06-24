@@ -1,0 +1,33 @@
+# Node
+node_modules/
+dist/
+dist-electron/
+.vite/
+
+# Build artifacts
+electron/backend-build/
+backend/.venv-build/
+electron/build/icon.icns
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# OS
+.DS_Store
+
+# Editor / tooling
+.claude/
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env
+.env
+.env.local
