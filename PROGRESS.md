@@ -88,14 +88,45 @@ Legend: ✅ done · ⚠️ implemented but not yet confirmed against the live VP
 
 ---
 
-## Roadmap / next steps
+## Remaining work
 
-1. **Live end-to-end test pass** of the remaining unverified modules
-   (upload/download, editor save, log tail). Terminal now confirmed live.
-2. **SSH key authentication** (key path + passphrase) — recommended given the
-   user's key-based setup.
-3. ~~Relocate the project out of iCloud and confirm clean startup.~~ **Done** —
-   now at `~/Projects/vps-manager`.
-4. Optional: signing + notarization for distribution.
-5. Optional: terminal copy/paste polish; framed WS protocol to remove the
-   control-frame heuristic.
+Grouped by priority. Items are open unless marked **Done**.
+
+### P1 — required to call the app "validated"
+
+- [ ] **Live end-to-end test pass** of the modules still marked ⚠️ above:
+  - [ ] **Upload / download** — drag a file in, download one out; verify
+        progress, large files, and that the shared SFTP lock isn't held for the
+        whole transfer (dedicated channel path).
+  - [ ] **Editor save** — open a file in Monaco, edit, save; confirm the write
+        round-trips and permissions/owner are preserved.
+  - [ ] **Log tail** — open `/logs`, pick a file, confirm live `tail -F` streams
+        and stops cleanly on close.
+- [ ] **SSH key authentication** (key path + passphrase). Password-only today;
+      key-based auth matches the user's actual setup and is the main gap.
+
+### P2 — hardening / correctness
+
+- [ ] **Framed WS protocol** for terminal + logs to replace the length+shape
+      control-frame heuristic (removes the rare false-positive risk).
+- [ ] **Privileged logs** — decide how to handle root-only logs
+      (`/var/log/syslog`, `auth.log`): document the `adm`/`syslog` group
+      requirement in-app, or add an opt-in `sudo` path.
+- [ ] **Terminal copy/paste** — explicit handlers instead of relying on the OS
+      clipboard.
+
+### P3 — distribution (optional)
+
+- [ ] **Code signing + notarization** (Developer ID) so the `.dmg` runs without
+      the Gatekeeper quarantine workaround.
+- [ ] **x64 build** — requires running `build-backend.sh` on Intel/Rosetta
+      (PyInstaller can't cross-compile).
+- [ ] **Monaco bundle size** — code-split or trim bundled languages (~4 MB JS).
+
+### Done
+
+- [x] Relocate the project out of iCloud and confirm clean startup — now at
+      `~/Projects/vps-manager`.
+- [x] Dynamic `$HOME` resolution at connection time (confirmed live).
+- [x] `start.sh` stops the backend + Vite when the Electron window closes.
+- [x] Initial commit pushed to GitHub (`ha7wski/vps-manager`).
