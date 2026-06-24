@@ -7,12 +7,12 @@ import FileList from "../components/FileList";
 import FileEditor from "../components/FileEditor";
 
 // The tree is rooted at "/" so the whole filesystem is browsable; the explorer
-// opens on the home directory and auto-expands the tree down to it.
+// opens on the SSH user's home directory (resolved at connect time) and
+// auto-expands the tree down to it, falling back to "/" if unknown.
 const TREE_ROOT = "/";
-const INITIAL_PATH = "/";
 
-export default function FileExplorer() {
-  const [currentPath, setCurrentPath] = useState(INITIAL_PATH);
+export default function FileExplorer({ home }) {
+  const [currentPath, setCurrentPath] = useState(home || "/");
   const [editing, setEditing] = useState(null); // { path, name }
   // Bumped after mutations so the tree re-fetches its cached children.
   const [refreshKey, setRefreshKey] = useState(0);

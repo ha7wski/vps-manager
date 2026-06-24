@@ -152,9 +152,9 @@ Notes:
 | Method | Path | Purpose |
 |--------|------|---------|
 | GET  | `/health` | liveness probe |
-| POST | `/connect` | open SSH+SFTP session `{host,port,username,password}` |
+| POST | `/connect` | open SSH+SFTP session `{host,port,username,password}` → `{status, host, username, home}` |
 | POST | `/disconnect` | close the session |
-| GET  | `/status` | `{connected, host, username}` |
+| GET  | `/status` | `{connected, host, username, home}` |
 | GET  | `/files/list?path=` | directory listing |
 | GET  | `/files/read?path=` | read UTF-8 text (400 on binary) |
 | POST | `/files/write` | create/overwrite a file |

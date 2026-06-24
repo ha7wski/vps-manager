@@ -56,6 +56,8 @@ class SSHClientSingleton:
         self.host: str | None = None
         self.port: int | None = None
         self.username: str | None = None
+        # Absolute home directory of the SSH user, resolved at connect time.
+        self.home: str | None = None
 
     # -- lifecycle ---------------------------------------------------------
 
@@ -102,11 +104,20 @@ class SSHClientSingleton:
                 client.close()
                 raise ConnectionFailedError(f"Connected but failed to open SFTP: {exc}") from exc
 
+            # Resolve the user's home directory: the SFTP working directory
+            # starts at $HOME, so normalizing "." yields its absolute path.
+            # Fall back to "/" if the server rejects the request.
+            try:
+                home = sftp.normalize(".")
+            except (paramiko.SSHException, OSError):
+                home = "/"
+
             self._client = client
             self._sftp = sftp
             self.host = host
             self.port = port
             self.username = username
+            self.home = home
 
     def disconnect(self) -> None:
         """Close SFTP and SSH cleanly. Safe to call when already disconnected."""
@@ -132,6 +143,7 @@ class SSHClientSingleton:
         self.host = None
         self.port = None
         self.username = None
+        self.home = None
 
     # -- accessors ---------------------------------------------------------
 

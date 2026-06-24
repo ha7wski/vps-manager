@@ -39,6 +39,7 @@ def connect(req: ConnectRequest):
         "status": "connected",
         "host": ssh_client.host,
         "username": ssh_client.username,
+        "home": ssh_client.home,
     }
 
 
@@ -57,4 +58,5 @@ def status():
         "connected": connected,
         "host": ssh_client.host if connected else None,
         "username": ssh_client.username if connected else None,
+        "home": ssh_client.home if connected else None,
     }

@@ -51,7 +51,7 @@ export default function App() {
         onDisconnect={handleDisconnect}
       />
       <main className="flex-1 overflow-hidden bg-gray-900 p-6">
-        <ActivePage />
+        <ActivePage home={connection.home} />
       </main>
     </div>
   );
