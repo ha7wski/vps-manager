@@ -7,12 +7,13 @@ import FileList from "../components/FileList";
 import FileEditor from "../components/FileEditor";
 
 // The tree is rooted at "/" so the whole filesystem is browsable; the explorer
-// opens on the SSH user's home directory (resolved at connect time) and
-// auto-expands the tree down to it, falling back to "/" if unknown.
+// opens on /opt (where the user's applications live) and auto-expands the tree
+// down to it.
 const TREE_ROOT = "/";
+const START_PATH = "/opt";
 
-export default function FileExplorer({ home }) {
-  const [currentPath, setCurrentPath] = useState(home || "/");
+export default function FileExplorer() {
+  const [currentPath, setCurrentPath] = useState(START_PATH);
   const [editing, setEditing] = useState(null); // { path, name }
   // Bumped after mutations so the tree re-fetches its cached children.
   const [refreshKey, setRefreshKey] = useState(0);
@@ -27,17 +28,21 @@ export default function FileExplorer({ home }) {
         onSelect={setCurrentPath}
         refreshKey={refreshKey}
       />
-      <FileList
-        path={currentPath}
-        onNavigate={setCurrentPath}
-        onOpenFile={(path, name) => setEditing({ path, name })}
-        refreshKey={refreshKey}
-        onChanged={bumpRefresh}
-      />
+      {/* Right panel: the file list, with the editor overlaying only this area
+          (not the tree) so the folder tree stays visible while editing. */}
+      <div className="relative flex-1 overflow-hidden">
+        <FileList
+          path={currentPath}
+          onNavigate={setCurrentPath}
+          onOpenFile={(path, name) => setEditing({ path, name })}
+          refreshKey={refreshKey}
+          onChanged={bumpRefresh}
+        />
 
-      {editing && (
-        <FileEditor path={editing.path} name={editing.name} onClose={() => setEditing(null)} />
-      )}
+        {editing && (
+          <FileEditor path={editing.path} name={editing.name} onClose={() => setEditing(null)} />
+        )}
+      </div>
     </div>
   );
 }

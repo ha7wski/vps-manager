@@ -5,6 +5,11 @@
 //   - connected    → Sidebar (240px) + active page
 //
 // The active page is selected via the sidebar nav. Files is the default view.
+//
+// The Terminal page is special: it owns live shell sessions (WebSockets + xterm
+// scrollback) that must survive navigating to other pages. So it stays mounted
+// at all times and is merely hidden with CSS when another page is active. The
+// other pages are stateless data views and mount/unmount on demand.
 
 import { useState } from "react";
 import ConnectionForm from "./components/ConnectionForm";
@@ -17,7 +22,6 @@ import { apiFetch } from "./api";
 
 const PAGES = {
   files: FileExplorer,
-  terminal: Terminal,
   dashboard: Dashboard,
   logs: Logs,
 };
@@ -40,6 +44,7 @@ export default function App() {
     return <ConnectionForm onConnected={setConnection} />;
   }
 
+  const isTerminal = page === "terminal";
   const ActivePage = PAGES[page] ?? FileExplorer;
 
   return (
@@ -51,7 +56,12 @@ export default function App() {
         onDisconnect={handleDisconnect}
       />
       <main className="flex-1 overflow-hidden bg-gray-900 p-6">
-        <ActivePage home={connection.home} />
+        {/* Terminal stays mounted so its shell sessions and scrollback persist;
+            it's hidden (not unmounted) when another page is active. */}
+        <div className={isTerminal ? "h-full" : "hidden"}>
+          <Terminal home={connection.home} active={isTerminal} />
+        </div>
+        {!isTerminal && <ActivePage home={connection.home} />}
       </main>
     </div>
   );

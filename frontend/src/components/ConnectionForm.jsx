@@ -38,7 +38,13 @@ export default function ConnectionForm({ onConnected }) {
   }
 
   return (
-    <div className="flex h-full items-center justify-center bg-gray-950 text-gray-200">
+    <div className="relative flex h-full items-center justify-center bg-gray-950 text-gray-200">
+      {/* Draggable top strip so the window can be moved before connecting
+          (hiddenInset title bar has no native drag region). */}
+      <div
+        className="absolute inset-x-0 top-0 h-8"
+        style={{ WebkitAppRegion: "drag" }}
+      />
       <form
         onSubmit={handleSubmit}
         className="w-[380px] rounded-xl border border-gray-800 bg-gray-900 p-8 shadow-2xl"

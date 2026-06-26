@@ -1,19 +1,33 @@
 // Terminal page: tab bar of independent SSH sessions + a toolbar (clear,
 // font size). Each tab keeps its own WebSocket/xterm alive while hidden.
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, X, Trash2, Minus } from "lucide-react";
 import TerminalTab from "../components/TerminalTab";
 
 let nextId = 1;
 
-export default function Terminal() {
+// `active` is false while another page is shown (this page stays mounted but
+// CSS-hidden, so its sessions/scrollback persist). When it becomes visible
+// again the active tab is re-measured and re-focused.
+export default function Terminal({ active = true }) {
   const [tabs, setTabs] = useState(() => [{ id: nextId++ }]);
   const [activeId, setActiveId] = useState(tabs[0].id);
   const [fontSize, setFontSize] = useState(14);
 
   // Imperative handles keyed by tab id (clear/focus/refit).
   const handles = useRef({});
+
+  // The page was hidden via display:none, which zeroes the xterm size. On
+  // re-show, refit and refocus the active tab once layout has settled.
+  useEffect(() => {
+    if (!active) return;
+    const id = setTimeout(() => {
+      handles.current[activeId]?.refit();
+      handles.current[activeId]?.focus();
+    }, 0);
+    return () => clearTimeout(id);
+  }, [active, activeId]);
 
   function addTab() {
     const id = nextId++;
